@@ -1,167 +1,367 @@
-# EXp_03_-Entity-Student-and-build-a-CRUD-operations-using-Spring-Boot-Hibernate-Configuration
+# EX-03 - Student Entity and CRUD (Spring Boot + Hibernate)
+## NAME : Vembarasan P
+## REG NO: 212223220123
+## AIM
 
-## AIM:
-To develop a Spring Boot application that performs CRUD (Create, Read, Update, Delete) operations on a Student entity using Spring Data JPA (Hibernate).
+Develop a Spring Boot application that performs CRUD (Create, Read, Update, Delete) operations on a `Student` entity using Spring Data JPA (Hibernate).
 
-## ALGORITHM:
-Create Spring Boot Project
+## Requirements
 
-Add dependencies: Spring Web, Spring Data JPA, H2 Database or MySQL, Spring Boot DevTools
+- Java 17 or newer
+- Maven
+- Spring Boot (starter projects)
+- H2 (in-memory) or MySQL for persistence
 
-Configure application.properties
+## Algorithm
 
-Define database connection
+1. Create a Spring Boot project (Maven).
+2. Add dependencies: Spring Web, Spring Data JPA, H2 or MySQL.
+3. Configure `application.properties` for the datasource and Hibernate DDL.
+4. Create the `Student` entity and annotate with `@Entity`.
+5. Create `StudentRepository` by extending `JpaRepository`.
+6. Implement `StudentController` to expose REST endpoints.
+7. Run and test the endpoints (Postman / curl / browser).
 
-Enable Hibernate auto DDL
+## Project Structure
 
-Create Student Entity Class
+- `mvnw`, `mvnw.cmd` — Maven wrapper
+- `pom.xml` — module pom with dependencies and plugins
+- `.mvn/wrapper/maven-wrapper.properties`
+- `src/main/java/com/example/orm/`
+	- `OrmApplication.java` — Spring Boot entry point
+	- `Student.java` — JPA entity
+	- `StudentRepository.java` — `JpaRepository` interface
+	- `StudentService.java` — service layer
+	- `StudentController.java` — REST controller
+- `src/main/resources/application.properties` — datasource and JPA settings for the `orm` module
+- `src/test/java/com/example/orm/OrmApplicationTests.java` — basic module tests
 
-Annotate with @Entity
+## application.properties
 
-Define fields with @Id, @GeneratedValue, etc.
-
-Create StudentRepository
-
-Extend JpaRepository<Student, Long> for CRUD methods
-
-Create StudentController
-
-Handle HTTP methods:
-
-POST /students → Add student
-
-GET /students → Get all students
-
-GET /students/{id} → Get student by ID
-
-PUT /students/{id} → Update student
-
-DELETE /students/{id} → Delete student
-
-##PROGRAM CODE
-
-### pom.xml
-<dependencies>
-    <!-- Spring Boot Web -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-
-    <!-- Spring Boot JPA -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-
-    <!-- H2 Database (In-memory) -->
-    <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <scope>runtime</scope>
-    </dependency>
-</dependencies>
- ### application.properties
+```properties
+spring.application.name=orm
 
 spring.datasource.url=jdbc:h2:mem:testdb
 spring.datasource.driverClassName=org.h2.Driver
 spring.datasource.username=sa
 spring.datasource.password=
+
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
 spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+```
+
+## pom.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.0.6</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.example</groupId>
+	<artifactId>orm</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>orm</name>
+	<description/>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>17</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-h2console</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<annotationProcessorPaths>
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</path>
+							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-testCompile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+						<configuration>
+							<annotationProcessorPaths>
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</path>
+							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+
+```
+
 ### Student.java
-package com.example.demo.model;
-import jakarta.persistence.*;
+
+```java
+package com.example.orm;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
 @Entity
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
     private String name;
     private String department;
-    private int age;
-    // Getters and Setters
-    public Long getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public void setName(String name) { this.name = name; }
+    public String getName() {
+        return name;
+    }
 
-    public String getDepartment() { return department; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public void setDepartment(String department) { this.department = department; }
+    public String getDepartment() {
+        return department;
+    }
 
-    public int getAge() { return age; }
-
-    public void setAge(int age) { this.age = age; }
+    public void setDepartment(String department) {
+        this.department = department;
+    }
 }
-### StudentRepository.java
-package com.example.demo.repository;
+```
 
-import com.example.demo.model.Student;
+### StudentRepository.java
+
+```java
+package com.example.orm;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface StudentRepository extends JpaRepository<Student, Long> {
+public interface StudentRepository extends JpaRepository<Student, Integer>{
+
 }
+```
+
 ### StudentController.java
-package com.example.demo.controller;
 
-import com.example.demo.model.Student;
-import com.example.demo.repository.StudentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+```java
+package com.example.orm;
+
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/students")
 public class StudentController {
 
-    @Autowired
-    private StudentRepository studentRepository;
+    private final StudentService service;
 
-    @PostMapping
-    public Student addStudent(@RequestBody Student student) {
-        return studentRepository.save(student);
+    public StudentController(StudentService service) {
+        this.service = service;
     }
 
-    @GetMapping
+    // Save Data
+    @PostMapping("/save")
+    public Student saveStudent(@RequestBody Student s) {
+        return service.saveStudent(s);
+    }
+
+    // Get All Data
+    @GetMapping("/all")
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        return service.getAllStudents();
     }
 
-    @GetMapping("/{id}")
-    public Optional<Student> getStudent(@PathVariable Long id) {
-        return studentRepository.findById(id);
-    }
-
+    // Update
     @PutMapping("/{id}")
-    public Student updateStudent(@PathVariable Long id, @RequestBody Student studentDetails) {
-        Student student = studentRepository.findById(id).orElseThrow();
-        student.setName(studentDetails.getName());
-        student.setAge(studentDetails.getAge());
-        student.setDepartment(studentDetails.getDepartment());
-        return studentRepository.save(student);
+    public Student updateStudent(@PathVariable int id, @RequestBody Student s) {
+        return service.updateStudent(id, s);
     }
 
+    // DELETE - Delete
     @DeleteMapping("/{id}")
-    public String deleteStudent(@PathVariable Long id) {
-        studentRepository.deleteById(id);
-        return "Student with ID " + id + " deleted successfully!";
+    public String deleteStudent(@PathVariable int id) {
+        return service.deleteStudent(id);
     }
 }
-### DemoApplication.java
-package com.example.demo;
+```
+
+### StudentService.java
+
+```java
+package com.example.orm;
+
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+@Service
+public class StudentService {
+
+    private final StudentRepository repo;
+
+    public StudentService(StudentRepository repo) {
+        this.repo = repo;
+    }
+
+    // POST
+    public Student saveStudent(Student s) {
+        return repo.save(s);
+    }
+
+    // GET ALL
+    public List<Student> getAllStudents() {
+        return repo.findAll();
+    }
+
+    // UPDATE
+    public Student updateStudent(int id, Student s) {
+        Student data = repo.findById(id).orElse(null);
+
+        if (data != null) {
+            data.setName(s.getName());
+            data.setId(s.getId());
+            data.setDepartment(s.getDepartment());
+            return repo.save(data);
+        }
+
+        return null;
+    }
+
+    // DELETE
+    public String deleteStudent(int id) {
+        repo.deleteById(id);
+        return "Deleted Successfully";
+    }
+}
+```
+
+### OrmApplication.java
+
+```java
+package com.example.orm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DemoApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
-    }
+public class OrmApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(OrmApplication.class, args);
+	}
+
 }
+```
+
+## Output
+
+- `POST /students` — create a student
+
+![alt text](image.png)
+
+- `GET /students` — list all students
+
+![alt text](image-1.png)
+
+- `PUT /students/{id}` — update student
+
+![alt text](image-2.png)
+
+- `DELETE /students/{id}` — delete student
+
+![alt text](image-3.png)
+
+## Result
+
+Thus the development of a Spring Boot application that performs CRUD operations is completed successfully
