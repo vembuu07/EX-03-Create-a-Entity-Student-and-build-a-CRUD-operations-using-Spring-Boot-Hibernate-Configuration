@@ -1,6 +1,5 @@
 # EX-03 - Student Entity and CRUD (Spring Boot + Hibernate)
-## NAME : Vembarasan P
-## REG NO: 212223220123
+
 ## AIM
 
 Develop a Spring Boot application that performs CRUD (Create, Read, Update, Delete) operations on a `Student` entity using Spring Data JPA (Hibernate).
@@ -348,19 +347,23 @@ public class OrmApplication {
 
 - `POST /students` — create a student
 
-![alt text](image.png)
+<img width="1335" height="772" alt="image" src="https://github.com/user-attachments/assets/30846851-6596-4c25-b760-a68143693cef" />
+
 
 - `GET /students` — list all students
 
-![alt text](image-1.png)
+<img width="1356" height="456" alt="image" src="https://github.com/user-attachments/assets/80a9302a-0e78-4b31-8f6a-e5b3f6a5cfdf" />
+
 
 - `PUT /students/{id}` — update student
 
-![alt text](image-2.png)
+<img width="1203" height="385" alt="image" src="https://github.com/user-attachments/assets/e42ebb71-4109-4428-814f-c085a9971f08" />
+
 
 - `DELETE /students/{id}` — delete student
 
-![alt text](image-3.png)
+<img width="1206" height="416" alt="image" src="https://github.com/user-attachments/assets/e4b3742b-fd4b-422f-9e65-4d91a4012d88" />
+
 
 ## Result
 
